@@ -1,0 +1,14 @@
+'use strict';
+DT.download = (blob,name) => {const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;
+ document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);};
+DT.preparePrint = s => {document.querySelector('#print-view').innerHTML=`<h1>Choosing a University for Master's Study</h1><p>Decision Tree Builder · Generated ${DT.escape(new Date().toLocaleString())}</p><p>${DT.validate(s).length?'In progress':'Structurally complete'}</p>${DT.tree(s).svg}${DT.summaryHTML(s)}<h2>Reflection responses</h2>${DT.questions.map((q,i)=>s.reflections[i]?.trim()?`<section><h3>${DT.escape(q)}</h3><p class="response">${DT.escape(s.reflections[i])}</p></section>`:'').join('')||'<p>No reflection responses entered.</p>'}`;};
+DT.exportFile = async (s,format) => {if(format==='print'){DT.preparePrint(s);
+ window.print();return;}if(format==='json'){DT.download(new Blob([JSON.stringify({...s,factors:DT.provided},null,2)],{type:'application/json'}),'university-decision-tree.json');return;}const tree=DT.tree(s),blob=new Blob([tree.svg],{type:'image/svg+xml;charset=utf-8'});
+ if(format==='svg'){DT.download(blob,'university-decision-tree.svg');return;}const url=URL.createObjectURL(blob);
+ try{const img=new Image();await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error('The image could not be generated. Try SVG or Print instead.'));img.src=url;});
+ const scale=Math.min(2,12000/tree.width,12000/tree.height,Math.sqrt(24000000/(tree.width*tree.height)));
+ const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(tree.width*scale));canvas.height=Math.max(1,Math.round(tree.height*scale));
+ const ctx=canvas.getContext('2d');
+ if(!ctx)throw Error('PNG export is unavailable. Use SVG instead.');ctx.scale(scale,scale);ctx.drawImage(img,0,0);
+ const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+ if(!png)throw Error('PNG export is too large. Use SVG instead.');DT.download(png,'university-decision-tree.png');}finally{URL.revokeObjectURL(url);}};
