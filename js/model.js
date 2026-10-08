@@ -2,7 +2,12 @@
 window.DT = (() => {
   const provided = ['University QS ranking','Price / tuition fees','Cost of living','University location','Recommendation from family or friends'].map((label,i)=>({id:'f'+i,label,type:'provided'}));
   const maxCustom = 3;
-  const questions = ['Why did you choose this factor as your root node?','Which factor has the greatest influence on your final decision?','Are there factors in your tree that could be measured objectively and others that depend on personal judgement?','Would changing the order of the decision nodes change your eventual choice?','What information would you need to apply this decision tree to real universities?','Is there a factor that you initially thought was important but did not ultimately include?',"How might another student's decision tree differ from yours?"];
+  const questions = [
+    "Reflect on why you have chosen as specific root node. Would changing the order of the decision nodes change your eventual choice?",
+    "Assume you are acting as a University executive. How can decision trees like the one you have built inform your decision-making?",
+    "Algorithms like random forest still rely on the average of individual tree predictions. Knowing that, what should university executives consider before making decisions based on decision tree algorithms?",
+    "Are there important subjective factors that would be hard to account for in a decision tree ?"
+];
   const clone = x => JSON.parse(JSON.stringify(x));
   const id = () => 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,9);
   const fresh = () => ({customFactors:[],rootNodeId:null,nodes:{},branches:{},leaves:{},reflections:{},metadata:{version:1}});
